@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Solar System 3D Explorer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23fbbf24'/><circle cx='16' cy='16' r='8' fill='%23fcd34d'/></svg>" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div id="info-panel">
+        <h1>Solar System 3D Explorer</h1>
+        <p>Click and drag to orbit. Scroll to zoom. Right-click or Ctrl+drag to pan. <span class="touch-hint">On touch: pinch to zoom, two-finger drag to pan.</span></p>
+        <p><strong>Keys:</strong> <kbd>Space</kbd> pause · <kbd>1</kbd>–<kbd>4</kbd> presets · <kbd>R</kbd> reset · <kbd>L</kbd> labels · <kbd>?</kbd> shortcuts. Hover to preview, click to lock. <strong>Double-click</strong> a planet or moon for the focus modal, or a <strong>spacecraft</strong> for how it works and brief history.</p>
+
+        <div class="controls-row go-to-row">
+            <label for="go-to-body" class="inline-label">Go to:</label>
+            <select id="go-to-body" title="Fly camera to body">
+                <option value="">— Select body —</option>
+            </select>
+        </div>
+        <div class="controls-row search-row">
+            <input type="text" id="search-body" placeholder="Search body or mission…" title="Type and press Enter to go">
+        </div>
+
+        <div id="selection-display">
+            Hover over a planet, moon, or spacecraft!
+        </div>
+
+        <div id="controls">
+            <div class="controls-row">
+                <button id="toggle-animation-button">Pause orbits</button>
+
+                <label for="speed-select" class="inline-label">Speed:</label>
+                <select id="speed-select">
+                    <option value="0.5">0.5×</option>
+                    <option value="1" selected>1×</option>
+                    <option value="2">2×</option>
+                    <option value="4">4×</option>
+                </select>
+            </div>
+
+            <div class="controls-row toggles-row">
+                <label>
+                    <input type="checkbox" id="toggle-orbits" checked>
+                    Orbits
+                </label>
+                <label>
+                    <input type="checkbox" id="toggle-asteroids" checked>
+                    Asteroid belt
+                </label>
+                <label>
+                    <input type="checkbox" id="toggle-kuiper" checked>
+                    Kuiper belt
+                </label>
+                <label>
+                    <input type="checkbox" id="toggle-labels" checked>
+                    Labels
+                </label>
+                <label>
+                    <input type="checkbox" id="toggle-pause-modal" title="Pause orbits while body modal is open">
+                    Pause in modal
+                </label>
+                <label>
+                    <input type="checkbox" id="toggle-theme" title="Toggle panel theme">
+                    Light panel
+                </label>
+            </div>
+
+            <div class="controls-row presets-row">
+                <span class="controls-label">Presets:</span>
+                <button class="preset-button" data-preset="inner">Inner system</button>
+                <button class="preset-button" data-preset="giants">Gas giants</button>
+                <button class="preset-button" data-preset="outer">Outer system</button>
+                <button class="preset-button" data-preset="top">Top view</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="top-right-controls">
+        <button id="fullscreen-button" type="button" title="Fullscreen" aria-label="Fullscreen">⛶</button>
+        <button id="snapshot-button" type="button" title="Take snapshot" aria-label="Take snapshot">📷</button>
+        <button id="reset-view-button">Reset View</button>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay" aria-live="polite">
+        <span>Loading solar system…</span>
+    </div>
+
+    <div id="minimap-container" class="minimap-container" title="System overview">
+        <canvas id="minimap" class="minimap" width="120" height="120" aria-hidden="true"></canvas>
+        <div id="minimap-tooltip" class="minimap-tooltip hidden" aria-hidden="true"></div>
+    </div>
+
+    <button type="button" id="shortcuts-hint" class="shortcuts-hint" title="Show keyboard shortcuts">?</button>
+    <div id="shortcuts-overlay" class="shortcuts-overlay hidden" aria-hidden="true">
+        <div class="shortcuts-content">
+            <h3>Keyboard shortcuts</h3>
+            <p><kbd>Space</kbd> Pause / resume orbits</p>
+            <p><kbd>1</kbd> Inner system · <kbd>2</kbd> Gas giants · <kbd>3</kbd> Outer · <kbd>4</kbd> Top view</p>
+            <p><kbd>R</kbd> Reset view · <kbd>L</kbd> Toggle labels · <kbd>?</kbd> This help</p>
+            <button type="button" id="shortcuts-close">Close</button>
+        </div>
+    </div>
+
+    <div id="scale-comparison" class="scale-comparison" aria-live="polite"></div>
+
+    <label id="sound-toggle-wrap" class="sound-toggle-wrap">
+        <input type="checkbox" id="sound-toggle" title="Ambient sound"> Sound
+    </label>
+
+    <!-- Focus overlay: darkens scene when a body is focused (double-click) -->
+    <div id="focus-overlay" class="focus-overlay hidden" aria-hidden="true"></div>
+
+    <!-- White modal overlay (Google-style: body in modal, info panel, zoom/rotate) -->
+    <div id="body-modal" class="body-modal hidden" aria-hidden="true">
+        <div class="body-modal-backdrop"></div>
+        <div class="body-modal-card">
+            <button type="button" class="body-modal-close" id="body-modal-close" aria-label="Close">×</button>
+            <div class="body-modal-globe-wrap">
+                <div class="body-modal-controls">
+                    <button type="button" class="modal-btn modal-rotate" id="modal-rotate" aria-label="Rotate">↻</button>
+                    <button type="button" class="modal-btn modal-zoom-in" id="modal-zoom-in" aria-label="Zoom in">+</button>
+                    <button type="button" class="modal-btn modal-zoom-out" id="modal-zoom-out" aria-label="Zoom out">−</button>
+                </div>
+                <div id="modal-globe-view" class="modal-globe-view"></div>
+                <div id="modal-marker-tooltip" class="modal-marker-tooltip hidden">Missions</div>
+            </div>
+            <div class="body-modal-info">
+                <h2 id="modal-body-title" class="modal-title">—</h2>
+                <p id="modal-body-subtitle" class="modal-subtitle">From our project</p>
+                <div class="modal-fact-card" id="modal-fact-card"></div>
+                <p id="modal-body-description" class="modal-description"></p>
+                <div class="modal-collapsible-section">
+                    <details open>
+                        <summary>Missions</summary>
+                        <div id="modal-missions-list" class="modal-missions-list"></div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="detail-modal" class="detail-modal hidden" aria-hidden="true">
+        <div class="detail-overlay"></div>
+        <div class="detail-content">
+            <button type="button" class="detail-close" id="detail-close" aria-label="Close">×</button>
+            <div id="detail-body"></div>
+        </div>
+    </div>
+
+    <script src="js/vendor/three.min.js"></script>
+    <script src="js/vendor/OrbitControls.js"></script>
+    
+    <!-- Cache-bust main.js so GitHub Pages/CDN pick up latest version -->
+    <script src="js/main.js?v=3"></script>
+
+</body>
+</html>
