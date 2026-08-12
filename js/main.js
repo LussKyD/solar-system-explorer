@@ -2008,9 +2008,11 @@ window.addEventListener('click', (event) => {
 });
 
 // Double-click: celestial body → body modal; spacecraft (Mission) → spacecraft detail modal (how it works, history)
-window.addEventListener('dblclick', (event) => {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+// Shared by both the mouse 'dblclick' listener and the touch double-tap detector below,
+// so desktop and mobile trigger identically the same logic.
+function handleBodyDoubleActivate(clientX, clientY) {
+    mouse.x = (clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(selectableObjects);
     if (intersects.length > 0) {
@@ -2042,7 +2044,34 @@ window.addEventListener('dblclick', (event) => {
             }
         }
     }
+}
+
+window.addEventListener('dblclick', (event) => {
+    handleBodyDoubleActivate(event.clientX, event.clientY);
 });
+
+// Touch double-tap: native 'dblclick' doesn't fire reliably from touch on all mobile browsers,
+// so detect two touchend events close together in time and position and treat it the same way.
+let lastTapTime = 0;
+let lastTapX = 0;
+let lastTapY = 0;
+window.addEventListener('touchend', (event) => {
+    if (!event.changedTouches || event.changedTouches.length === 0) return;
+    const touch = event.changedTouches[0];
+    const now = Date.now();
+    const dx = touch.clientX - lastTapX;
+    const dy = touch.clientY - lastTapY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (now - lastTapTime < 350 && distance < 30) {
+        handleBodyDoubleActivate(touch.clientX, touch.clientY);
+        lastTapTime = 0; // reset so a third quick tap doesn't chain into another double-tap
+    } else {
+        lastTapTime = now;
+        lastTapX = touch.clientX;
+        lastTapY = touch.clientY;
+    }
+}, { passive: true });
 
 // Detail modal close
 if (detailCloseBtn) detailCloseBtn.addEventListener('click', closeDetailModal);
