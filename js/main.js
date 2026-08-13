@@ -188,7 +188,13 @@ const MISSIONS = [
         status: 'Completed',
         description: 'First crewed Moon landing (Neil Armstrong & Buzz Aldrin).',
         longitudeDeg: 23.47,
-        latitudeDeg: 0.67
+        latitudeDeg: 0.67,
+        flightPath: {
+            launchSite: { lat: 28.608, lon: -80.604 }, // Kennedy Space Center, Pad 39A
+            launchDateLabel: 'July 16, 1969 · 9:32 AM EDT',
+            outcome: 'success',
+            successNote: 'Reached Earth orbit, then translunar injection about 3 hours later. Landed on the Moon July 20, 1969.'
+        }
     },
     {
         id: 'apollo-12',
@@ -259,6 +265,26 @@ const MISSIONS = [
         year: 1970,
         status: 'Crew returned safely after in-flight failure.',
         description: 'Famous \"successful failure\" mission; no lunar landing.'
+    },
+    {
+        id: 'sts-51l-challenger',
+        name: 'STS-51-L (Challenger)',
+        agency: 'NASA (USA)',
+        target: 'Earth',
+        type: 'Crewed orbiter (launch failure)',
+        year: 1986,
+        status: 'Broke apart 73 seconds after launch; all 7 crew lost.',
+        description: 'Space Shuttle Challenger disintegrated shortly after liftoff when hot gas escaped through a failed O-ring seal in the right solid rocket booster, weakened by unusually cold overnight temperatures at the launch site.',
+        flightPath: {
+            launchSite: { lat: 28.627, lon: -80.621 }, // Kennedy Space Center, Pad 39B
+            launchDateLabel: 'January 28, 1986 · 11:38 AM EST',
+            outcome: 'failure',
+            failure: {
+                elapsedSeconds: 73,
+                altitudeKm: 14,
+                note: 'At T+73 seconds, an O-ring seal in the right solid rocket booster failed, weakened by unusually cold overnight temperatures. The external tank broke apart at about 14 km (46,000 ft) altitude. All 7 crew members were lost.'
+            }
+        }
     },
     {
         id: 'luna-2',
@@ -1380,7 +1406,11 @@ function selectMissionInModalById(missionId) {
         missionsEl.appendChild(detailEl);
     }
     const desc = mission.description || mission.status || 'No additional details.';
-    detailEl.innerHTML = `<p class="mission-detail-text">${desc}</p>`;
+    let detailHtml = `<p class="mission-detail-text">${desc}</p>`;
+    if (mission.flightPath) {
+        detailHtml += `<button type="button" class="watch-launch-btn" data-mission-id="${mission.id}">▶ Watch Launch</button>`;
+    }
+    detailEl.innerHTML = detailHtml;
     detailEl.classList.remove('hidden');
 
     if (modalMarkerTooltip) {
@@ -1824,6 +1854,188 @@ function addSpacecraftToScene() {
 }
 addSpacecraftToScene();
 
+// ---------------------------------------------------------------------------
+// Mission launch-sequence replay ("Watch Launch")
+// On-demand cinematic playback of a mission's real ascent, parented to Earth's
+// rotating mesh so it inherits both Earth's spin and orbital position for free.
+// Rendered only while active — not a permanent object in the scene — so this
+// scales to many missions without cluttering the main view or costing perf.
+// ---------------------------------------------------------------------------
+let launchSequence = null; // active playback state, or null when idle
+const launchSequencePanel = document.getElementById('launch-sequence-panel');
+const launchSequenceTitle = document.getElementById('launch-sequence-title');
+const launchSequenceText = document.getElementById('launch-sequence-text');
+const launchSequenceTime = document.getElementById('launch-sequence-time');
+const launchSequenceCloseBtn = document.getElementById('launch-sequence-close');
+
+// Convert a lat/lon (degrees) to a local position on a sphere of given radius,
+// using the same spherical convention already used elsewhere in this file
+// (see the deep-space spacecraft placement above) for consistency.
+function latLonToLocalPosition(lat, lon, radius) {
+    const DEG = Math.PI / 180;
+    const phi = (90 - lat) * DEG;
+    const theta = (lon + 180) * DEG;
+    return new THREE.Vector3(
+        -radius * Math.sin(phi) * Math.cos(theta),
+        radius * Math.cos(phi),
+        radius * Math.sin(phi) * Math.sin(theta)
+    );
+}
+
+function clearLaunchSequence() {
+    if (launchSequence) {
+        if (launchSequence.group && launchSequence.group.parent) {
+            launchSequence.group.parent.remove(launchSequence.group);
+        }
+        launchSequence = null;
+    }
+    if (launchSequencePanel) launchSequencePanel.classList.add('hidden');
+}
+
+function playMissionLaunch(mission) {
+    if (!mission || !mission.flightPath || !earthMesh) return;
+    clearLaunchSequence();
+    closeDetailModal();
+    if (typeof closeBodyModal === 'function') closeBodyModal();
+
+    const fp = mission.flightPath;
+    const earthPlanetData = PLANETS.find(p => p.name === 'Earth');
+    const earthRadius = earthPlanetData ? earthPlanetData.radius : 0.5;
+
+    // Launch site sits on Earth's surface at the real lat/lon; parented to earthMesh
+    // so it automatically inherits Earth's rotation and orbital position.
+    const launchPos = latLonToLocalPosition(fp.launchSite.lat, fp.launchSite.lon, earthRadius);
+    const outward = launchPos.clone().normalize();
+
+    // End point: successful missions arc out toward "reached orbit" distance;
+    // failures stop proportionally short, scaled to the real altitude reached.
+    const orbitReachDistance = earthRadius + 0.12; // matches the existing LEO convention used for ISS/Hubble
+    let endRadius;
+    if (fp.outcome === 'failure' && fp.failure) {
+        // Real ascent to LEO covers ~300km; scale the failure's real altitude proportionally
+        // against that, with a floor so it's still visible just above the surface.
+        const fraction = Math.min(0.9, Math.max(0.12, fp.failure.altitudeKm / 300));
+        endRadius = earthRadius + (orbitReachDistance - earthRadius) * fraction;
+    } else {
+        endRadius = orbitReachDistance;
+    }
+
+    // A gentle pitch-over arc (real ascents aren't straight up): control point offset
+    // sideways from the straight radial line, roughly matching real launch profiles.
+    const tangent = new THREE.Vector3(-outward.z, 0, outward.x).normalize();
+    const controlPoint = launchPos.clone()
+        .add(outward.clone().multiplyScalar((endRadius - earthRadius) * 0.6))
+        .add(tangent.multiplyScalar((endRadius - earthRadius) * 0.5));
+    const endPoint = outward.clone().multiplyScalar(endRadius);
+
+    const curve = new THREE.QuadraticBezierCurve3(launchPos, controlPoint, endPoint);
+    const curvePoints = curve.getPoints(64);
+
+    const group = new THREE.Object3D();
+
+    const lineGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    lineGeometry.setDrawRange(0, 0);
+    const lineColor = fp.outcome === 'failure' ? 0xf87171 : 0x60a5fa;
+    const line = new THREE.Line(lineGeometry, new THREE.LineBasicMaterial({ color: lineColor, transparent: true, opacity: 0.9 }));
+    group.add(line);
+
+    const markerGeometry = new THREE.SphereGeometry(0.035, 12, 12);
+    const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+    marker.position.copy(launchPos);
+    group.add(marker);
+
+    // A small marker at the launch pad itself, left in place for context.
+    const padGeometry = new THREE.ConeGeometry(0.02, 0.05, 8);
+    const padMaterial = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+    const pad = new THREE.Mesh(padGeometry, padMaterial);
+    pad.position.copy(launchPos);
+    pad.lookAt(launchPos.clone().add(outward));
+    pad.rotateX(Math.PI / 2);
+    group.add(pad);
+
+    earthMesh.add(group);
+
+    const totalPoints = curvePoints.length;
+    const durationMs = PREFERS_REDUCED_MOTION ? 100 : 6000;
+
+    launchSequence = {
+        mission,
+        group,
+        line,
+        marker,
+        curvePoints,
+        totalPoints,
+        startTime: performance.now(),
+        duration: durationMs,
+        outcome: fp.outcome,
+        realElapsedSeconds: fp.outcome === 'failure' && fp.failure ? fp.failure.elapsedSeconds : null,
+        finished: false
+    };
+
+    // Fly the camera to a good viewing angle near Earth for the sequence.
+    const earthWorldPos = new THREE.Vector3();
+    earthMesh.getWorldPosition(earthWorldPos);
+    const camOffset = new THREE.Vector3(earthRadius * 3, earthRadius * 1.5, earthRadius * 3.2);
+    startCameraTransition(earthWorldPos.clone().add(camOffset), earthWorldPos.clone(), PREFERS_REDUCED_MOTION ? 300 : 1800);
+
+    if (launchSequencePanel && launchSequenceTitle && launchSequenceText) {
+        launchSequencePanel.classList.remove('hidden');
+        launchSequenceTitle.textContent = mission.name + ' — Launch';
+        launchSequenceTitle.classList.remove('outcome-failure');
+        launchSequenceText.textContent = fp.launchDateLabel ? ('Liftoff: ' + fp.launchDateLabel) : 'Liftoff';
+        if (launchSequenceTime) launchSequenceTime.textContent = 'T+0s';
+    }
+}
+
+// Called every frame from animate() while a launch sequence is active.
+function updateLaunchSequence(nowMs) {
+    if (!launchSequence || launchSequence.finished) return;
+    const elapsed = nowMs - launchSequence.startTime;
+    const t = Math.min(1, elapsed / launchSequence.duration);
+    const pointIndex = Math.max(1, Math.floor(t * (launchSequence.totalPoints - 1)) + 1);
+    launchSequence.line.geometry.setDrawRange(0, pointIndex);
+    const currentPoint = launchSequence.curvePoints[pointIndex - 1];
+    if (currentPoint) launchSequence.marker.position.copy(currentPoint);
+
+    if (launchSequenceTime) {
+        if (launchSequence.realElapsedSeconds != null) {
+            launchSequenceTime.textContent = 'T+' + Math.round(t * launchSequence.realElapsedSeconds) + 's';
+        } else {
+            launchSequenceTime.textContent = t < 1 ? 'Ascending…' : 'Reached orbit';
+        }
+    }
+
+    if (t >= 1 && !launchSequence.finished) {
+        launchSequence.finished = true;
+        const fp = launchSequence.mission.flightPath;
+        if (launchSequenceTitle && launchSequenceText) {
+            if (launchSequence.outcome === 'failure' && fp.failure) {
+                launchSequenceTitle.textContent = launchSequence.mission.name + ' — Loss of vehicle';
+                launchSequenceTitle.classList.add('outcome-failure');
+                launchSequenceText.textContent = fp.failure.note;
+                if (launchSequenceTime) launchSequenceTime.textContent = 'T+' + fp.failure.elapsedSeconds + 's';
+            } else {
+                launchSequenceTitle.textContent = launchSequence.mission.name + ' — Reached orbit';
+                launchSequenceText.textContent = fp.successNote || 'Successfully reached orbit.';
+            }
+        }
+    }
+}
+
+if (launchSequenceCloseBtn) {
+    launchSequenceCloseBtn.addEventListener('click', clearLaunchSequence);
+}
+if (bodyModal) {
+    bodyModal.addEventListener('click', (event) => {
+        const btn = event.target.closest('.watch-launch-btn');
+        if (!btn) return;
+        const missionId = btn.getAttribute('data-mission-id');
+        const mission = MISSIONS.find(m => m.id === missionId);
+        if (mission) playMissionLaunch(mission);
+    });
+}
+
 // Set planet and moon orbits to approximate "today" positions (asteroid/Kuiper keep random spread)
 (function setInitialOrbitsToToday() {
     var daysSinceEpoch = (Date.now() - REALTIME_EPOCH_MS) / (24 * 60 * 60 * 1000);
@@ -1843,7 +2055,7 @@ const _modalWorldPos = new THREE.Vector3();
 function animate() {
     requestAnimationFrame(animate);
     var modalOpen = bodyModal && !bodyModal.classList.contains('hidden');
-    var effectivelyPaused = animationPaused || (pauseWhenModalOpen && modalOpen);
+    var effectivelyPaused = animationPaused || (pauseWhenModalOpen && modalOpen) || !!launchSequence;
 
     if (!effectivelyPaused) {
         sun.rotation.y += 0.001 * speedMultiplier; 
@@ -1885,6 +2097,11 @@ function animate() {
         if (t >= 1) {
             cameraTransition = null;
         }
+    }
+
+    // Mission launch-sequence replay (runs independent of orbit pause, like camera transitions)
+    if (launchSequence) {
+        updateLaunchSequence(performance.now());
     }
 
     // Selection highlight ring and orbit trail
