@@ -27,6 +27,61 @@ canvas {
     backdrop-filter: blur(10px);
 }
 
+/* Launch sequence replay caption */
+#launch-sequence-panel {
+    position: absolute;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%);
+    width: min(560px, calc(100vw - 32px));
+    padding: 16px 20px;
+    background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.97), rgba(15, 23, 42, 0.9));
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    z-index: 20;
+    backdrop-filter: blur(10px);
+    color: #f9fafb;
+}
+#launch-sequence-panel.hidden { display: none; }
+#launch-sequence-panel h3 {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    color: #93c5fd;
+}
+#launch-sequence-panel h3.outcome-failure {
+    color: #fca5a5;
+}
+#launch-sequence-panel p {
+    margin: 0 0 10px 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #e5e7eb;
+}
+#launch-sequence-panel .launch-sequence-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+#launch-sequence-panel .launch-sequence-time {
+    font-size: 12px;
+    color: #94a3b8;
+    font-variant-numeric: tabular-nums;
+}
+#launch-sequence-close {
+    background: rgba(148, 163, 184, 0.15);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    color: #f9fafb;
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 12.5px;
+    cursor: pointer;
+}
+#launch-sequence-close:hover {
+    background: rgba(148, 163, 184, 0.3);
+}
+
 #info-panel h1 {
     font-size: 1.15rem;
     margin: 0 0 6px;
@@ -735,6 +790,19 @@ kbd {
 }
 .modal-missions-list .mission-detail-text {
     margin: 0;
+}
+.watch-launch-btn {
+    margin-top: 10px;
+    background: #1e293b;
+    color: #f9fafb;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.watch-launch-btn:hover {
+    background: #334155;
 }
 
 /* Basic responsiveness and touch */
