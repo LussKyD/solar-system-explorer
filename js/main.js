@@ -176,7 +176,13 @@ const MISSIONS = [
         description: 'First artificial satellite to orbit Earth.',
         altitudeKm: 215,
         longitudeDeg: -20,
-        inclinationDeg: 65
+        inclinationDeg: 65,
+        flightPath: {
+            launchSite: { lat: 45.9203, lon: 63.3422 }, // Baikonur, Site 1/5 ("Gagarin's Start")
+            launchDateLabel: 'October 4, 1957 · 19:28:34 UTC',
+            outcome: 'success',
+            successNote: 'Launched on a modified R-7 intercontinental ballistic missile and reached orbit about 5 minutes after liftoff — the first human-made object ever to do so. It circled Earth every 96 minutes, transmitting its famous radio "beep" for 21 days before its batteries died, and burned up on reentry on January 4, 1958.'
+        }
     },
     {
         id: 'apollo-11',
@@ -206,7 +212,13 @@ const MISSIONS = [
         status: 'Completed',
         description: 'Second crewed Moon landing near Surveyor 3.',
         longitudeDeg: -23.42,
-        latitudeDeg: -3.01
+        latitudeDeg: -3.01,
+        flightPath: {
+            launchSite: { lat: 28.608, lon: -80.604 }, // Kennedy Space Center, Pad 39A
+            launchDateLabel: 'November 14, 1969 · 11:22 AM EST',
+            outcome: 'success',
+            successNote: 'Struck by lightning twice during ascent (T+36s and T+52s), knocking out telemetry and the guidance platform. Flight controller John Aaron\'s call to "try SCE to AUX" let the crew restore power, and the Saturn V reached Earth orbit undamaged.'
+        }
     },
     {
         id: 'apollo-14',
@@ -218,7 +230,13 @@ const MISSIONS = [
         status: 'Completed',
         description: 'Third crewed Moon landing at Fra Mauro.',
         longitudeDeg: -17.47,
-        latitudeDeg: -3.65
+        latitudeDeg: -3.65,
+        flightPath: {
+            launchSite: { lat: 28.608, lon: -80.604 }, // Kennedy Space Center, Pad 39A
+            launchDateLabel: 'January 31, 1971 · 4:03 PM EST',
+            outcome: 'success',
+            successNote: 'Reached Earth parking orbit on schedule after a launch delayed 40 minutes by weather. Translunar injection followed about an hour later, sending Shepard, Roosa and Mitchell toward the Fra Mauro highlands.'
+        }
     },
     {
         id: 'apollo-15',
@@ -230,7 +248,13 @@ const MISSIONS = [
         status: 'Completed',
         description: 'First mission with the Lunar Roving Vehicle.',
         longitudeDeg: 3.65,
-        latitudeDeg: 26.1
+        latitudeDeg: 26.1,
+        flightPath: {
+            launchSite: { lat: 28.608, lon: -80.604 }, // Kennedy Space Center, Pad 39A
+            launchDateLabel: 'July 26, 1971 · 9:34 AM EDT',
+            outcome: 'success',
+            successNote: 'Reached Earth parking orbit 11 minutes 44 seconds after liftoff. First of the heavier "J-class" Apollo missions, carrying the Lunar Roving Vehicle to the Moon for the first time.'
+        }
     },
     {
         id: 'apollo-16',
@@ -242,7 +266,13 @@ const MISSIONS = [
         status: 'Completed',
         description: 'Explored the lunar highlands near Descartes.',
         longitudeDeg: 15.5,
-        latitudeDeg: -8.97
+        latitudeDeg: -8.97,
+        flightPath: {
+            launchSite: { lat: 28.608, lon: -80.604 }, // Kennedy Space Center, Pad 39A
+            launchDateLabel: 'April 16, 1972 · 12:54 PM EST',
+            outcome: 'success',
+            successNote: 'Reached Earth orbit on a nominal ascent, carrying Young, Mattingly and Duke toward the lunar highlands near Descartes for the first geological survey of that terrain.'
+        }
     },
     {
         id: 'apollo-17',
@@ -254,7 +284,13 @@ const MISSIONS = [
         status: 'Completed',
         description: 'Last crewed Moon landing; first geologist on the Moon.',
         longitudeDeg: 30.77,
-        latitudeDeg: 20.19
+        latitudeDeg: 20.19,
+        flightPath: {
+            launchSite: { lat: 28.608, lon: -80.604 }, // Kennedy Space Center, Pad 39A
+            launchDateLabel: 'December 7, 1972 · 12:33 AM EST',
+            outcome: 'success',
+            successNote: 'Delayed 2 hours 40 minutes by a countdown sequencer fault, then lifted off as the only night launch of the Apollo program, turning the Florida sky to daylight before reaching Earth orbit with Cernan, Evans and Schmitt aboard.'
+        }
     },
     {
         id: 'apollo-13',
@@ -264,7 +300,13 @@ const MISSIONS = [
         type: 'Crewed mission (aborted landing)',
         year: 1970,
         status: 'Crew returned safely after in-flight failure.',
-        description: 'Famous \"successful failure\" mission; no lunar landing.'
+        description: 'Famous \"successful failure\" mission; no lunar landing.',
+        flightPath: {
+            launchSite: { lat: 28.608, lon: -80.604 }, // Kennedy Space Center, Pad 39A
+            launchDateLabel: 'April 11, 1970 · 2:13 PM EST',
+            outcome: 'success',
+            successNote: 'The ascent itself was nominal — a center engine on the second stage shut down two minutes early, and the other engines simply burned longer to compensate. Apollo 13 reached Earth orbit safely. The famous oxygen tank explosion that aborted the Moon landing happened two days later, en route to the Moon, not during launch.'
+        }
     },
     {
         id: 'sts-51l-challenger',
@@ -294,7 +336,13 @@ const MISSIONS = [
         type: 'Impact probe',
         year: 1959,
         status: 'Impact on lunar surface.',
-        description: 'First human-made object to reach the Moon.'
+        description: 'First human-made object to reach the Moon.',
+        flightPath: {
+            launchSite: { lat: 45.9203, lon: 63.3422 }, // Baikonur, Site 1/5 ("Gagarin's Start")
+            launchDateLabel: 'September 12, 1959 · 06:39:42 UTC',
+            outcome: 'success',
+            successNote: 'Launched on a direct path to the Moon on a modified R-7 rocket. About 36 hours later it struck the lunar surface near the Aristides, Archimedes and Autolycus craters — the first human-made object to touch another world.'
+        }
     },
     {
         id: 'luna-9',
@@ -304,7 +352,13 @@ const MISSIONS = [
         type: 'Lander',
         year: 1966,
         status: 'Completed',
-        description: 'First successful soft landing on the Moon.'
+        description: 'First successful soft landing on the Moon.',
+        flightPath: {
+            launchSite: { lat: 45.9961, lon: 63.5642 }, // Baikonur, Site 31/6
+            launchDateLabel: 'January 31, 1966 · 11:41:37 UTC',
+            outcome: 'success',
+            successNote: 'Reached a parking orbit before its Molniya upper stage sent it toward the Moon. On February 3, 1966, Luna 9 achieved the first successful soft landing on another world and transmitted the first close-up photographs from the lunar surface.'
+        }
     },
     {
         id: 'luna-15',
@@ -314,7 +368,13 @@ const MISSIONS = [
         type: 'Sample return (failed)',
         year: 1969,
         status: 'Crashed during descent near Mare Crisium.',
-        description: 'Attempted sample return mission that failed during landing.'
+        description: 'Attempted sample return mission that failed during landing.',
+        flightPath: {
+            launchSite: { lat: 46.071, lon: 62.985 }, // Baikonur, Site 81/24
+            launchDateLabel: 'July 13, 1969 · 02:54:42 UTC',
+            outcome: 'success',
+            successNote: 'Launched on a Proton rocket three days before Apollo 11, in an unstated attempt to return lunar soil to Earth first. The Earth ascent and lunar orbit insertion were both successful — the failure came 8 days later during the final descent, when Luna 15 struck a mountainside in Mare Crisium, just hours before Armstrong and Aldrin lifted off from the Moon.'
+        }
     },
     {
         id: 'chang-e-3',
@@ -324,7 +384,13 @@ const MISSIONS = [
         type: 'Lander & rover',
         year: 2013,
         status: 'Mission complete.',
-        description: 'First soft landing on the Moon since 1976; carried Yutu rover.'
+        description: 'First soft landing on the Moon since 1976; carried Yutu rover.',
+        flightPath: {
+            launchSite: { lat: 28.2455, lon: 102.027 }, // Xichang Satellite Launch Center, LC-2
+            launchDateLabel: 'December 1, 2013 · 17:30 UTC',
+            outcome: 'success',
+            successNote: 'Launched on a Long March 3B directly onto a translunar trajectory. Landed in Sinus Iridum on December 14, 2013 — the first soft lunar landing by any nation since the Soviet Luna 24 in 1976.'
+        }
     },
     {
         id: 'chang-e-4',
@@ -334,7 +400,13 @@ const MISSIONS = [
         type: 'Lander & rover',
         year: 2018,
         status: 'Operational.',
-        description: 'First soft landing on the lunar far side; carries Yutu-2 rover.'
+        description: 'First soft landing on the lunar far side; carries Yutu-2 rover.',
+        flightPath: {
+            launchSite: { lat: 28.2455, lon: 102.027 }, // Xichang Satellite Launch Center, LA-2
+            launchDateLabel: 'December 7, 2018 · 18:23 UTC',
+            outcome: 'success',
+            successNote: 'Launched on a Long March 3B, relying on the Queqiao relay satellite (placed at Earth-Moon L2 seven months earlier) to communicate once on the far side. Landed in Von Kármán crater on January 3, 2019 — the first-ever landing on the Moon\'s far side.'
+        }
     },
     {
         id: 'chandrayaan-2',
@@ -344,7 +416,13 @@ const MISSIONS = [
         type: 'Orbiter, lander & rover (partial success)',
         year: 2019,
         status: 'Orbiter operational; lander crashed.',
-        description: 'India\'s second lunar mission; orbiter continues to study the Moon.'
+        description: 'India\'s second lunar mission; orbiter continues to study the Moon.',
+        flightPath: {
+            launchSite: { lat: 13.7199, lon: 80.2304 }, // Satish Dhawan Space Centre, Second Launch Pad
+            launchDateLabel: 'July 22, 2019 · 09:13 UTC',
+            outcome: 'success',
+            successNote: 'India\'s heaviest rocket, the GSLV Mk III, placed Chandrayaan-2 into Earth orbit cleanly after a launch delayed a week by a cryogenic-stage helium leak. The orbiter remains operational; the Vikram lander crashed during its final descent to the Moon on September 6, 2019 — a failure at the destination, not at launch.'
+        }
     },
     {
         id: 'iss',
@@ -357,7 +435,13 @@ const MISSIONS = [
         description: 'Modular space station in low Earth orbit, permanently crewed.',
         altitudeKm: 420,
         longitudeDeg: 45,
-        inclinationDeg: 51.6
+        inclinationDeg: 51.6,
+        flightPath: {
+            launchSite: { lat: 46.071, lon: 62.985 }, // Baikonur, Site 81/23
+            launchDateLabel: 'November 20, 1998 · 06:40 UTC',
+            outcome: 'success',
+            successNote: 'The Zarya module — the station\'s first piece — launched on a Proton-K rocket and reached orbit on schedule. It would be joined by the American Unity module two weeks later, beginning two decades of continuous assembly and habitation.'
+        }
     },
     {
         id: 'hubble',
@@ -370,7 +454,13 @@ const MISSIONS = [
         description: 'Iconic space telescope that revolutionized astronomy.',
         altitudeKm: 540,
         longitudeDeg: 160,
-        inclinationDeg: 28.5
+        inclinationDeg: 28.5,
+        flightPath: {
+            launchSite: { lat: 28.627, lon: -80.621 }, // Kennedy Space Center, Pad 39B
+            launchDateLabel: 'April 24, 1990 · 8:33:51 AM EDT',
+            outcome: 'success',
+            successNote: 'Carried to orbit in the payload bay of Space Shuttle Discovery on mission STS-31, then deployed by the crew the next day using the shuttle\'s robotic arm — the highest orbit a shuttle had flown to at that point.'
+        }
     },
     {
         id: 'jwst',
@@ -383,7 +473,13 @@ const MISSIONS = [
         description: 'Infrared observatory at Sun–Earth L2; successor to Hubble for deep-space imaging.',
         altitudeKm: 1.5e6,
         longitudeDeg: 200,
-        inclinationDeg: 0
+        inclinationDeg: 0,
+        flightPath: {
+            launchSite: { lat: 5.239, lon: -52.768 }, // Guiana Space Centre, ELA-3
+            launchDateLabel: 'December 25, 2021 · 07:20 AM EST',
+            outcome: 'success',
+            successNote: 'Launched on an Ariane 5 with such precise trajectory accuracy that ground controllers used far less onboard fuel than planned for course correction — extending the telescope\'s operational life well beyond its original 10-year estimate. It reached the Sun-Earth L2 point, 1.5 million km out, about a month later.'
+        }
     },
     // Mars missions
     {
@@ -396,7 +492,13 @@ const MISSIONS = [
         status: 'Completed',
         description: 'First successful Mars lander and orbiter mission.',
         orbitalRadiusOffset: 1.0,
-        alongOrbitDeg: 40
+        alongOrbitDeg: 40,
+        flightPath: {
+            launchSite: { lat: 28.583, lon: -80.583 }, // Cape Canaveral, Launch Complex 41
+            launchDateLabel: 'August 20, 1975 · 5:22 PM EDT',
+            outcome: 'success',
+            successNote: 'Launched on a Titan IIIE-Centaur, reaching Earth parking orbit before the Centaur upper stage re-ignited to send it toward Mars — an 11-month cruise ending with the first fully successful landing on another planet, on July 20, 1976.'
+        }
     },
     {
         id: 'venera-7',
@@ -407,7 +509,13 @@ const MISSIONS = [
         year: 1970,
         status: 'First successful landing on another planet (short-lived).',
         orbitalRadiusOffset: 0.8,
-        alongOrbitDeg: -60
+        alongOrbitDeg: -60,
+        flightPath: {
+            launchSite: { lat: 45.9961, lon: 63.5642 }, // Baikonur, Site 31/6
+            launchDateLabel: 'August 17, 1970 · 05:38:22 UTC',
+            outcome: 'success',
+            successNote: 'Launched on a Molniya rocket toward Venus. On December 15, 1970, it became the first spacecraft to transmit data from the surface of another planet — surviving just 23 minutes in Venus\'s crushing 90-atmosphere pressure and 465°C heat before falling silent.'
+        }
     },
     {
         id: 'mars-climate-orbiter',
@@ -418,7 +526,13 @@ const MISSIONS = [
         year: 1998,
         status: 'Lost due to navigation error (metric/imperial mismatch).',
         orbitalRadiusOffset: 0.8,
-        alongOrbitDeg: 120
+        alongOrbitDeg: 120,
+        flightPath: {
+            launchSite: { lat: 28.447, lon: -80.566 }, // Cape Canaveral, Launch Complex 17A
+            launchDateLabel: 'December 11, 1998 · 1:45:51 PM EST',
+            outcome: 'success',
+            successNote: 'The Delta II launch was entirely nominal and put the spacecraft on a correct course for Mars. The failure came 9 months later, at the destination: ground software used imperial pound-seconds while the spacecraft expected metric newton-seconds, sending it too low into the Martian atmosphere where it broke apart on September 23, 1999.'
+        }
     },
     {
         id: 'sojourner',
@@ -430,7 +544,13 @@ const MISSIONS = [
         status: 'Completed',
         description: 'First successful Mars rover.',
         orbitalRadiusOffset: 0.6,
-        alongOrbitDeg: -120
+        alongOrbitDeg: -120,
+        flightPath: {
+            launchSite: { lat: 28.447, lon: -80.566 }, // Cape Canaveral, Launch Complex 17A
+            launchDateLabel: 'December 4, 1996 · 1:58 AM EST',
+            outcome: 'success',
+            successNote: 'Launched on a Delta II directly onto a Mars transfer trajectory. Instead of a powered landing, it used an airbag system to bounce to a stop in Ares Vallis on July 4, 1997 — the first use of that landing method, later reused for Spirit and Opportunity.'
+        }
     },
     {
         id: 'spirit',
@@ -442,7 +562,13 @@ const MISSIONS = [
         status: 'Mission complete',
         description: 'Mars Exploration Rover; operated for over 6 years.',
         orbitalRadiusOffset: 0.4,
-        alongOrbitDeg: -10
+        alongOrbitDeg: -10,
+        flightPath: {
+            launchSite: { lat: 28.447, lon: -80.566 }, // Cape Canaveral, Launch Complex 17A
+            launchDateLabel: 'June 10, 2003 · 1:59 PM EDT',
+            outcome: 'success',
+            successNote: 'Launched on a Delta II, the first of two Mars Exploration Rovers to leave Earth. Landed in Gusev Crater on January 4, 2004, and kept working for over six years — 25 times its planned 90-day mission.'
+        }
     },
     {
         id: 'opportunity',
@@ -454,7 +580,13 @@ const MISSIONS = [
         status: 'Mission complete',
         description: 'Mars rover that operated for nearly 15 years.',
         orbitalRadiusOffset: 0.4,
-        alongOrbitDeg: 30
+        alongOrbitDeg: 30,
+        flightPath: {
+            launchSite: { lat: 28.436, lon: -80.577 }, // Cape Canaveral, Launch Complex 17B
+            launchDateLabel: 'July 7, 2003 · 11:18 PM EDT',
+            outcome: 'success',
+            successNote: 'Launched three weeks after its twin Spirit, on a Delta II from the neighboring pad 17B. Landed on the opposite side of Mars in Meridiani Planum on January 25, 2004, and kept driving until 2018 — nearly 15 years, the longest surface mission on another world at the time.'
+        }
     },
     {
         id: 'curiosity',
@@ -466,7 +598,13 @@ const MISSIONS = [
         status: 'Operational',
         description: 'Nuclear-powered rover exploring Gale Crater.',
         orbitalRadiusOffset: 0.2,
-        alongOrbitDeg: 70
+        alongOrbitDeg: 70,
+        flightPath: {
+            launchSite: { lat: 28.583, lon: -80.583 }, // Cape Canaveral, Space Launch Complex 41
+            launchDateLabel: 'November 26, 2011 · 10:02 AM EST',
+            outcome: 'success',
+            successNote: 'Launched on an Atlas V, too heavy for airbags — instead it used a first-of-its-kind "sky crane" that lowered the rover on cables from a hovering rocket stage. Landed in Gale Crater on August 6, 2012, and has been climbing Mount Sharp ever since.'
+        }
     },
     {
         id: 'perseverance',
@@ -478,7 +616,13 @@ const MISSIONS = [
         status: 'Operational',
         description: 'Mars rover exploring Jezero Crater with a focus on astrobiology.',
         orbitalRadiusOffset: 0.1,
-        alongOrbitDeg: -70
+        alongOrbitDeg: -70,
+        flightPath: {
+            launchSite: { lat: 28.583, lon: -80.583 }, // Cape Canaveral, Space Launch Complex 41
+            launchDateLabel: 'July 30, 2020 · 7:50 AM EDT',
+            outcome: 'success',
+            successNote: 'Launched on an Atlas V during Mars\'s tight 2020 launch window. Landed in Jezero Crater on February 18, 2021, using an upgraded sky-crane system with terrain-relative navigation, and carried the small Ingenuity helicopter — the first powered flight on another planet — attached to its belly.'
+        }
     },
     // Outer solar system
     {
@@ -492,7 +636,13 @@ const MISSIONS = [
         description: 'Most distant human-made object, exploring interstellar space.',
         radialDistance: 140, // scaled distance from Sun
         polarAngleDeg: 20,
-        azimuthDeg: 45
+        azimuthDeg: 45,
+        flightPath: {
+            launchSite: { lat: 28.583, lon: -80.583 }, // Cape Canaveral, Launch Complex 41
+            launchDateLabel: 'September 5, 1977 · 8:56 AM EDT',
+            outcome: 'success',
+            successNote: 'Despite the "1" in its name, Voyager 1 launched 16 days after Voyager 2, on a faster trajectory that let it overtake its twin before reaching Jupiter. It is now the most distant human-made object in existence, having crossed into interstellar space in 2012.'
+        }
     },
     {
         id: 'voyager-2',
@@ -505,7 +655,13 @@ const MISSIONS = [
         description: 'Only spacecraft to have visited Uranus and Neptune.',
         radialDistance: 120,
         polarAngleDeg: 40,
-        azimuthDeg: -60
+        azimuthDeg: -60,
+        flightPath: {
+            launchSite: { lat: 28.583, lon: -80.583 }, // Cape Canaveral, Launch Complex 41
+            launchDateLabel: 'August 20, 1977 · 10:29 AM EDT',
+            outcome: 'success',
+            successNote: 'Launched first of the two Voyagers, on a slower path that took advantage of a rare planetary alignment to visit all four giant planets. It remains the only spacecraft to have flown past Uranus and Neptune.'
+        }
     },
     {
         id: 'pioneer-10',
@@ -518,7 +674,13 @@ const MISSIONS = [
         description: 'First spacecraft to travel through the asteroid belt and make direct observations of Jupiter.',
         radialDistance: 80,
         polarAngleDeg: 30,
-        azimuthDeg: 120
+        azimuthDeg: 120,
+        flightPath: {
+            launchSite: { lat: 28.484, lon: -80.542 }, // Cape Canaveral, Launch Complex 36A
+            launchDateLabel: 'March 2, 1972 · 8:49 PM EST',
+            outcome: 'success',
+            successNote: 'Launched on an Atlas-Centaur with a solid third stage, reaching the highest velocity of any human-made object at that time — enough to cross the Moon\'s orbit in just 11 hours. It became the first spacecraft to cross the asteroid belt and fly past Jupiter.'
+        }
     },
     {
         id: 'cassini-huygens',
@@ -531,7 +693,13 @@ const MISSIONS = [
         description: 'Revealed Saturn\'s rings, moons, and delivered the Huygens probe to Titan.',
         attachTo: 'Saturn',
         radialOffset: 3.0,
-        angleDeg: -45
+        angleDeg: -45,
+        flightPath: {
+            launchSite: { lat: 28.562, lon: -80.577 }, // Cape Canaveral, Launch Complex 40
+            launchDateLabel: 'October 15, 1997 · 4:43 AM EDT',
+            outcome: 'success',
+            successNote: 'Launched on a Titan IVB/Centaur, the most powerful US rocket flying at the time, carrying the largest interplanetary probe ever built. It took a nearly 7-year, multi-planet gravity-assist route through Venus and Jupiter before entering orbit around Saturn in 2004.'
+        }
     },
     {
         id: 'juno',
@@ -544,7 +712,13 @@ const MISSIONS = [
         description: 'Studies Jupiter\'s composition, gravity field, and magnetosphere.',
         attachTo: 'Jupiter',
         radialOffset: 3.0,
-        angleDeg: 60
+        angleDeg: 60,
+        flightPath: {
+            launchSite: { lat: 28.583, lon: -80.583 }, // Cape Canaveral, Space Launch Complex 41
+            launchDateLabel: 'August 5, 2011 · 12:25 PM EDT',
+            outcome: 'success',
+            successNote: 'Launched on an Atlas V, the first solar-powered spacecraft sent to Jupiter — previous outer-planet missions relied on plutonium generators. Its three enormous solar arrays span the size of a basketball court.'
+        }
     },
     {
         id: 'new-horizons',
@@ -557,7 +731,13 @@ const MISSIONS = [
         description: 'First spacecraft to explore Pluto and its moons, now exploring Kuiper Belt objects.',
         radialDistance: 90,
         polarAngleDeg: 70,
-        azimuthDeg: -20
+        azimuthDeg: -20,
+        flightPath: {
+            launchSite: { lat: 28.583, lon: -80.583 }, // Cape Canaveral, Launch Complex 41
+            launchDateLabel: 'January 19, 2006 · 2:00 PM EST',
+            outcome: 'success',
+            successNote: 'Launched on the fastest rocket combination ever flown — an Atlas V with a solid kick stage — leaving Earth faster than any spacecraft before it and passing the Moon\'s orbit in just 9 hours. It reached Pluto after a 9.5-year cruise in July 2015.'
+        }
     },
     // Sample missions from other agencies
     {
@@ -571,7 +751,13 @@ const MISSIONS = [
         description: 'Brought samples from asteroid Ryugu to Earth.',
         radialDistance: 50,
         polarAngleDeg: 80,
-        azimuthDeg: 10
+        azimuthDeg: 10,
+        flightPath: {
+            launchSite: { lat: 30.4022, lon: 130.975 }, // Tanegashima Space Center, Yoshinobu Launch Complex
+            launchDateLabel: 'December 3, 2014 · 04:22:04 UTC',
+            outcome: 'success',
+            successNote: 'Launched on an H-IIA rocket, the successor to Japan\'s first asteroid sample-return mission, Hayabusa. It rendezvoused with asteroid Ryugu in 2018, fired a copper projectile to collect subsurface material, and returned samples to Earth in December 2020.'
+        }
     },
     {
         id: 'rosetta',
@@ -584,7 +770,13 @@ const MISSIONS = [
         description: 'First spacecraft to orbit a comet and deploy a lander (Philae).',
         radialDistance: 65,
         polarAngleDeg: 100,
-        azimuthDeg: 150
+        azimuthDeg: 150,
+        flightPath: {
+            launchSite: { lat: 5.239, lon: -52.768 }, // Guiana Space Centre, ELA-3
+            launchDateLabel: 'March 2, 2004 · 07:17 UTC',
+            outcome: 'success',
+            successNote: 'Launched on an Ariane 5 after a year\'s delay caused by a different Ariane 5 failure. Reached comet 67P/Churyumov–Gerasimenko in 2014 after a 10-year, 6.4-billion-km journey using four gravity-assist flybys, then released the Philae lander for the first-ever soft landing on a comet nucleus.'
+        }
     },
     {
         id: 'parker-solar-probe',
@@ -597,7 +789,13 @@ const MISSIONS = [
         description: 'Closest-ever spacecraft to the Sun; studies the solar corona and solar wind.',
         radialDistance: 8,
         polarAngleDeg: 15,
-        azimuthDeg: 200
+        azimuthDeg: 200,
+        flightPath: {
+            launchSite: { lat: 28.532, lon: -80.567 }, // Cape Canaveral, Space Launch Complex 37B
+            launchDateLabel: 'August 12, 2018 · 3:31 AM EDT',
+            outcome: 'success',
+            successNote: 'Launched on a Delta IV Heavy, one of the most powerful rockets ever flown, needed to shed most of Earth\'s orbital speed so the probe could fall toward the Sun rather than orbit it. It has since become the fastest human-made object ever built, exceeding 690,000 km/h during close solar passes.'
+        }
     },
     {
         id: 'insight',
@@ -609,7 +807,13 @@ const MISSIONS = [
         status: 'Mission complete (end of 2022).',
         description: 'Studied Mars interior (seismology, heat flow).',
         orbitalRadiusOffset: 0.15,
-        alongOrbitDeg: -95
+        alongOrbitDeg: -95,
+        flightPath: {
+            launchSite: { lat: 34.632, lon: -120.611 }, // Vandenberg Air Force Base, Space Launch Complex 3E
+            launchDateLabel: 'May 5, 2018 · 4:05 AM PDT',
+            outcome: 'success',
+            successNote: 'Launched on an Atlas V from Vandenberg on the US West Coast — the first interplanetary mission ever launched from there instead of Florida. It landed on Elysium Planitia on November 26, 2018, and used a seismometer and heat probe to study Mars\'s deep interior for the first time.'
+        }
     },
     {
         id: 'osiris-rex',
@@ -622,7 +826,13 @@ const MISSIONS = [
         description: 'Collected samples from asteroid Bennu and returned them to Earth.',
         radialDistance: 45,
         polarAngleDeg: 60,
-        azimuthDeg: 80
+        azimuthDeg: 80,
+        flightPath: {
+            launchSite: { lat: 28.583, lon: -80.583 }, // Cape Canaveral, Space Launch Complex 41
+            launchDateLabel: 'September 8, 2016 · 7:05 PM EDT',
+            outcome: 'success',
+            successNote: 'Launched on an Atlas V toward asteroid Bennu, arriving in 2018. Its Touch-And-Go sample arm briefly touched the surface in 2020, firing nitrogen gas to kick up debris for collection — grabbing so much material it wedged a sample-return lid partly open. Samples reached Earth in September 2023.'
+        }
     }
 ];
 
