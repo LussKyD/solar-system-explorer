@@ -6,7 +6,7 @@ An interactive 3D visualization of the solar system built with Three.js. Explore
 ✨ Features
 
 * **Scaled solar system:** Sun, eight planets, and selected moons (Earth’s Moon, Mars’s Phobos & Deimos, Jupiter’s Io/Europa/Ganymede, Saturn’s Titan & Rhea, Uranus’s Titania, Neptune’s Triton) with orbit and rotation.
-* **Asteroid & Kuiper belts:** Visual belts between Mars - Jupiter and beyond Neptune.
+* **Asteroid & Kuiper belts:** Visual belts between Mars–Jupiter and beyond Neptune.
 * **Camera:** Orbit (drag), zoom (scroll), pan (right-click or Ctrl+drag). **Reset View** restores the default overview.
 * **Info panel:** Hover or click a body to see name, type, radius, orbital period, and distances. Click to lock selection.
 * **Body modal:** **Double-click** a planet or moon to open a focus view: 3D globe with zoom/rotate, key facts, and a **Missions** list. Click a mission to bring its marker to the front on the globe; click a marker on the globe to select that mission.
