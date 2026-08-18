@@ -634,7 +634,7 @@ const MISSIONS = [
         year: 1977,
         status: 'Operational',
         description: 'Most distant human-made object, exploring interstellar space.',
-        radialDistance: 140, // scaled distance from Sun
+        radialDistance: 140, // scaled distance from Sun (legacy static marker; superseded by journey.current for the Trace Journey view)
         polarAngleDeg: 20,
         azimuthDeg: 45,
         flightPath: {
@@ -642,6 +642,43 @@ const MISSIONS = [
             launchDateLabel: 'September 5, 1977 · 8:56 AM EDT',
             outcome: 'success',
             successNote: 'Despite the "1" in its name, Voyager 1 launched 16 days after Voyager 2, on a faster trajectory that let it overtake its twin before reaching Jupiter. It is now the most distant human-made object in existence, having crossed into interstellar space in 2012.'
+        },
+        // Real post-launch trajectory for the "Trace Journey" replay. Flyby legs reuse this
+        // app's own already-placed planet distances (PLANETS[].distance) and its existing
+        // circular-orbit angle model (REALTIME_EPOCH_MS + orbitalPeriodDays) evaluated at the
+        // real historical flyby date, so the path lines up with the planets exactly as this
+        // app already renders them — same precision level as the rest of the scene, no new
+        // guesswork. Legs beyond Pluto's orbit (no planet to anchor to) hold the same bearing
+        // as the last flyby and use auToSceneDistance() to extrapolate the compressed scale.
+        journey: {
+            legs: [
+                {
+                    body: 'Jupiter',
+                    date: '1979-03-05',
+                    dateLabel: 'March 5, 1979',
+                    note: 'Closest approach 12:05 UT, passing within about 349,000 km of Jupiter\'s center. Discovered active volcanoes on Io and two new moons, Thebe and Metis.'
+                },
+                {
+                    body: 'Saturn',
+                    date: '1980-11-12',
+                    dateLabel: 'November 12, 1980',
+                    note: 'Closest approach 23:46 UT, passing about 124,000 km above Saturn\'s cloud tops. A close flyby of the moon Titan bent the trajectory north out of the plane of the planets, ending any chance of visiting Uranus or Neptune.'
+                },
+                {
+                    holdBearingFrom: 'Saturn',
+                    label: 'Crossed the heliopause',
+                    date: '2012-08-25',
+                    dateLabel: 'August 25, 2012',
+                    distanceAU: 121.7, // backward-computed from the sourced Aug 2024 anchor + rate below, consistent with commonly cited ~121 AU
+                    note: 'Left the heliosphere — the bubble of solar wind and magnetic field blown out by the Sun — and became the first human-made object to enter true interstellar space.'
+                }
+            ],
+            current: {
+                referenceDate: '2024-08-21',
+                referenceDistanceAU: 164.7,
+                velocityKmS: 17.0,
+                sourceNote: 'NASA JPL, as of Aug 21, 2024: 164.7 AU from Earth, moving at 17.0 km/s relative to the Sun (~3.59 AU/year).'
+            }
         }
     },
     {
@@ -653,7 +690,7 @@ const MISSIONS = [
         year: 1977,
         status: 'Operational',
         description: 'Only spacecraft to have visited Uranus and Neptune.',
-        radialDistance: 120,
+        radialDistance: 120, // scaled distance from Sun (legacy static marker; superseded by journey.current for the Trace Journey view)
         polarAngleDeg: 40,
         azimuthDeg: -60,
         flightPath: {
@@ -661,6 +698,48 @@ const MISSIONS = [
             launchDateLabel: 'August 20, 1977 · 10:29 AM EDT',
             outcome: 'success',
             successNote: 'Launched first of the two Voyagers, on a slower path that took advantage of a rare planetary alignment to visit all four giant planets. It remains the only spacecraft to have flown past Uranus and Neptune.'
+        },
+        journey: {
+            legs: [
+                {
+                    body: 'Jupiter',
+                    date: '1979-07-09',
+                    dateLabel: 'July 9, 1979',
+                    note: 'Passed within about 570,000 km of Jupiter\'s cloud tops, four months after Voyager 1, confirming several of its twin\'s discoveries and returning new views of the Great Red Spot.'
+                },
+                {
+                    body: 'Saturn',
+                    date: '1981-08-25',
+                    dateLabel: 'August 25, 1981',
+                    note: 'Passed about 101,000 km from Saturn, deliberately aimed to bend its path onward toward Uranus — a trajectory only possible because of the rare outer-planet alignment of the late 1970s and 1980s.'
+                },
+                {
+                    body: 'Uranus',
+                    date: '1986-01-24',
+                    dateLabel: 'January 24, 1986',
+                    note: 'Passed within about 81,500 km of Uranus\'s cloud tops — the only spacecraft ever to visit the planet. Discovered 10 new moons and 2 new rings.'
+                },
+                {
+                    body: 'Neptune',
+                    date: '1989-08-25',
+                    dateLabel: 'August 25, 1989',
+                    note: 'The grand finale of the primary mission: passed just 4,951 km above Neptune\'s north pole, the closest flyby of any planet in the Voyager program, then dove south over Triton before heading out of the solar system.'
+                },
+                {
+                    holdBearingFrom: 'Neptune',
+                    label: 'Crossed the heliopause',
+                    date: '2018-11-05',
+                    dateLabel: 'November 5, 2018',
+                    distanceAU: 119.7, // NASA / Wikipedia, sourced at the crossing itself
+                    note: 'Became the second human-made object, after Voyager 1, to leave the heliosphere and enter interstellar space — this time with a working plasma instrument still returning data, which Voyager 1\'s no longer had.'
+                }
+            ],
+            current: {
+                referenceDate: '2012-09-09',
+                referenceDistanceAU: 99.504, // from the Sun (NASA), same source date also gives velocity below
+                velocityKmS: 15.436,
+                sourceNote: 'NASA JPL, as of Sept 9, 2012: 99.504 AU from the Sun, moving at 15.436 km/s relative to the Sun (~3.26 AU/year).'
+            }
         }
     },
     {
@@ -1620,6 +1699,9 @@ function selectMissionInModalById(missionId) {
     if (mission.flightPath) {
         detailHtml += `<button type="button" class="watch-launch-btn" data-mission-id="${mission.id}">▶ Watch Launch</button>`;
     }
+    if (mission.journey) {
+        detailHtml += `<button type="button" class="trace-journey-btn" data-mission-id="${mission.id}">✦ Trace Journey</button>`;
+    }
     detailEl.innerHTML = detailHtml;
     detailEl.classList.remove('hidden');
 
@@ -2065,6 +2147,62 @@ function addSpacecraftToScene() {
 addSpacecraftToScene();
 
 // ---------------------------------------------------------------------------
+// Journey math ("Trace Journey" support)
+// Shared by playMissionJourney() below. Kept separate from scene-building code
+// since these are pure functions, reused each time a journey sequence starts.
+// ---------------------------------------------------------------------------
+
+// Real km/s -> AU/year, using a Julian year (365.25 days) and the IAU-defined AU.
+function kmPerSecToAuPerYear(kmPerSec) {
+    const KM_PER_AU = 149597870.7;
+    const SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
+    return (kmPerSec * SECONDS_PER_YEAR) / KM_PER_AU;
+}
+
+// A mission's real current distance from the Sun, computed live from a sourced
+// reference date/distance/velocity (see journey.current in the mission data)
+// rather than a hardcoded number, so it stays accurate as real time passes.
+function getCurrentDistanceAU(mission) {
+    const cur = mission && mission.journey && mission.journey.current;
+    if (!cur) return null;
+    const refMs = new Date(cur.referenceDate + 'T00:00:00Z').getTime();
+    const yearsSince = (Date.now() - refMs) / (365.25 * 24 * 60 * 60 * 1000);
+    const auPerYear = kmPerSecToAuPerYear(cur.velocityKmS);
+    return cur.referenceDistanceAU + auPerYear * yearsSince;
+}
+
+// This app's own hand-placed AU -> scene-unit anchors (see the PLANETS distance/
+// distanceAU pairs above), extended past Pluto — the outermost existing anchor —
+// by continuing at the same local compression rate established by the Uranus->
+// Neptune->Pluto segment. Not a claim of a "true" formula (the inner-solar-system
+// spacing is hand-tuned for readability, same as everywhere else in this file);
+// just the most consistent way to place something farther out than any existing
+// anchor without inventing an unrelated new scale.
+function auToSceneDistance(au) {
+    const PLUTO_AU = 39.48, PLUTO_SCENE = 62.0;
+    const OUTER_RATE = 0.7423; // scene-units per AU, from (Pluto_scene - Neptune_scene) / (Pluto_AU - Neptune_AU)
+    if (au <= PLUTO_AU) return PLUTO_SCENE * (au / PLUTO_AU); // not used by Trace Journey today, kept honest/complete
+    return PLUTO_SCENE + OUTER_RATE * (au - PLUTO_AU);
+}
+
+// Reuses this app's own existing simplified circular-orbit convention (see
+// setInitialOrbitsToToday() above: angle = (daysSinceEpoch / orbitalPeriodDays) * 2π,
+// all bodies at angle 0 on REALTIME_EPOCH_MS) — evaluated at a real historical date
+// instead of "today". Exactly as accurate as this app's own live planet positions,
+// no more and no less; genuinely computed from the real orbital period, not a guess.
+function heliocentricAngleAtDate(orbitalPeriodDays, dateMs) {
+    const daysSinceEpoch = (dateMs - REALTIME_EPOCH_MS) / (24 * 60 * 60 * 1000);
+    return (daysSinceEpoch / orbitalPeriodDays) * Math.PI * 2;
+}
+
+// World-space position for a given scene distance + heliocentric angle, matching
+// the exact rotation convention PLANETS objects use (orbitGroup.rotation.y = angle
+// applied to a (distance, 0, 0) local point).
+function polarToWorldPosition(distance, angleRad) {
+    return new THREE.Vector3(distance, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), angleRad);
+}
+
+// ---------------------------------------------------------------------------
 // Mission launch-sequence replay ("Watch Launch")
 // On-demand cinematic playback of a mission's real ascent, parented to Earth's
 // rotating mesh so it inherits both Earth's spin and orbital position for free.
@@ -2246,6 +2384,221 @@ if (bodyModal) {
     });
 }
 
+// ---------------------------------------------------------------------------
+// Mission journey replay ("Trace Journey")
+// On-demand cinematic playback of a mission's real post-launch trajectory —
+// flyby to flyby, ending at a live-computed present-day position. Same on-
+// demand, rendered-only-while-active approach as playMissionLaunch() above,
+// extended to a multi-leg path spanning the whole solar system instead of a
+// single Earth-to-orbit arc. See journey math functions above (getCurrentDistanceAU,
+// auToSceneDistance, heliocentricAngleAtDate) for how each waypoint is computed.
+// ---------------------------------------------------------------------------
+let journeySequence = null; // active playback state, or null when idle
+const journeyPanel = document.getElementById('journey-panel');
+const journeyTitle = document.getElementById('journey-title');
+const journeyText = document.getElementById('journey-text');
+const journeyTime = document.getElementById('journey-time');
+const journeyLegIndicator = document.getElementById('journey-leg-indicator');
+const journeyCloseBtn = document.getElementById('journey-close');
+
+function clearJourneySequence() {
+    if (journeySequence) {
+        if (journeySequence.group && journeySequence.group.parent) {
+            journeySequence.group.parent.remove(journeySequence.group);
+        }
+        journeySequence = null;
+    }
+    if (journeyPanel) journeyPanel.classList.add('hidden');
+}
+
+function buildJourneyWaypoints(mission) {
+    const j = mission.journey;
+    const waypoints = [];
+
+    // Start at Earth's real position at the moment the sequence is launched
+    // (sampled once, not continuously tracked, so the path is stable to watch).
+    const earthWorldPos = new THREE.Vector3();
+    if (earthMesh) earthMesh.getWorldPosition(earthWorldPos);
+    waypoints.push({
+        position: earthWorldPos.clone(),
+        label: 'Earth',
+        dateLabel: mission.flightPath ? mission.flightPath.launchDateLabel : 'Launch',
+        note: 'Launch from Earth.'
+    });
+
+    let lastAngleRad = 0;
+    j.legs.forEach(leg => {
+        const dateMs = new Date(leg.date + 'T00:00:00Z').getTime();
+        let position;
+        if (leg.body) {
+            const planetData = PLANETS.find(p => p.name === leg.body);
+            if (!planetData) return; // defensive: skip rather than crash on bad data
+            lastAngleRad = heliocentricAngleAtDate(planetData.orbitalPeriodDays, dateMs);
+            position = polarToWorldPosition(planetData.distance, lastAngleRad);
+        } else {
+            // holdBearingFrom: continue in a straight line at the same bearing as the
+            // last real flyby (physically reasonable — post-flyby trajectories coast
+            // ballistically with only a very gradual solar deflection at these distances).
+            const sceneDist = auToSceneDistance(leg.distanceAU);
+            position = polarToWorldPosition(sceneDist, lastAngleRad);
+        }
+        waypoints.push({
+            position,
+            label: leg.body || leg.label,
+            dateLabel: leg.dateLabel,
+            note: leg.note
+        });
+    });
+
+    // Final waypoint: live-computed present-day position, same bearing as the last leg.
+    const currentAU = getCurrentDistanceAU(mission);
+    if (currentAU != null) {
+        const sceneDist = auToSceneDistance(currentAU);
+        const position = polarToWorldPosition(sceneDist, lastAngleRad);
+        const today = new Date();
+        waypoints.push({
+            position,
+            label: 'Current position',
+            dateLabel: today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ' (today)',
+            note: `Approximately ${currentAU.toFixed(1)} AU from the Sun today, still moving outward. ${j.current.sourceNote}`
+        });
+    }
+
+    return waypoints;
+}
+
+function playMissionJourney(mission) {
+    if (!mission || !mission.journey) return;
+    clearJourneySequence();
+    clearLaunchSequence();
+    closeDetailModal();
+    if (typeof closeBodyModal === 'function') closeBodyModal();
+
+    const waypoints = buildJourneyWaypoints(mission);
+    if (waypoints.length < 2) return;
+
+    const curvePoints3 = waypoints.map(w => w.position);
+    const curve = new THREE.CatmullRomCurve3(curvePoints3, false, 'catmullrom', 0.15);
+    const sampleCount = Math.max(200, waypoints.length * 60);
+    const curvePoints = curve.getPoints(sampleCount);
+
+    const group = new THREE.Object3D();
+
+    const lineGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    lineGeometry.setDrawRange(0, 0);
+    const line = new THREE.Line(lineGeometry, new THREE.LineBasicMaterial({ color: 0xa78bfa, transparent: true, opacity: 0.9 }));
+    group.add(line);
+
+    const markerGeometry = new THREE.SphereGeometry(0.4, 12, 12);
+    const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+    marker.position.copy(curvePoints[0]);
+    group.add(marker);
+
+    // A small marker at each real waypoint, left in place for context as the line passes them.
+    waypoints.forEach(w => {
+        const dot = new THREE.Mesh(
+            new THREE.SphereGeometry(0.25, 10, 10),
+            new THREE.MeshBasicMaterial({ color: 0xc4b5fd })
+        );
+        dot.position.copy(w.position);
+        group.add(dot);
+    });
+
+    scene.add(group);
+
+    // Equal time per leg (not distance-weighted) — simplest coherent pacing, and
+    // keeps a single flyby from dominating the runtime just because interstellar
+    // distances are numerically huge compared to planet-to-planet hops.
+    const legCount = waypoints.length - 1;
+    const totalPoints = curvePoints.length;
+    const durationMs = PREFERS_REDUCED_MOTION ? (100 * legCount) : (2600 * legCount);
+
+    journeySequence = {
+        mission,
+        group,
+        line,
+        marker,
+        curvePoints,
+        totalPoints,
+        waypoints,
+        legCount,
+        startTime: performance.now(),
+        duration: durationMs,
+        currentLegIndex: -1,
+        finished: false
+    };
+
+    // Wide establishing view so the whole outward path is visible at once.
+    const farthest = waypoints[waypoints.length - 1].position;
+    const viewDist = farthest.length();
+    startCameraTransition(
+        new THREE.Vector3(viewDist * 0.55, viewDist * 0.42, viewDist * 0.55),
+        new THREE.Vector3(0, 0, 0),
+        PREFERS_REDUCED_MOTION ? 300 : 2000
+    );
+
+    if (journeyPanel && journeyTitle && journeyText) {
+        journeyPanel.classList.remove('hidden');
+        journeyTitle.textContent = mission.name + ' — Journey';
+        journeyText.textContent = 'Departing Earth' + (waypoints[0].dateLabel ? (', ' + waypoints[0].dateLabel) : '') + '…';
+        if (journeyTime) journeyTime.textContent = '';
+        if (journeyLegIndicator) journeyLegIndicator.textContent = 'Leg 1 of ' + legCount;
+    }
+}
+
+// Called every frame from animate() while a journey sequence is active.
+function updateJourneySequence(nowMs) {
+    if (!journeySequence || journeySequence.finished) return;
+    const elapsed = nowMs - journeySequence.startTime;
+    const t = Math.min(1, elapsed / journeySequence.duration);
+    const pointIndex = Math.max(1, Math.floor(t * (journeySequence.totalPoints - 1)) + 1);
+    journeySequence.line.geometry.setDrawRange(0, pointIndex);
+    const currentPoint = journeySequence.curvePoints[pointIndex - 1];
+    if (currentPoint) journeySequence.marker.position.copy(currentPoint);
+
+    // Which leg are we currently on, given equal time-per-leg pacing?
+    const legIndex = Math.min(journeySequence.legCount - 1, Math.floor(t * journeySequence.legCount));
+    if (legIndex !== journeySequence.currentLegIndex) {
+        journeySequence.currentLegIndex = legIndex;
+        const arriving = journeySequence.waypoints[legIndex + 1];
+        if (journeyTitle && journeyText) {
+            journeyText.textContent = (arriving.label ? (arriving.label + ' — ') : '') + (arriving.dateLabel || '') + '. ' + (arriving.note || '');
+        }
+        if (journeyLegIndicator) {
+            journeyLegIndicator.textContent = 'Leg ' + (legIndex + 1) + ' of ' + journeySequence.legCount;
+        }
+    }
+    if (journeyTime) {
+        journeyTime.textContent = Math.round(t * 100) + '%';
+    }
+
+    if (t >= 1 && !journeySequence.finished) {
+        journeySequence.finished = true;
+        const last = journeySequence.waypoints[journeySequence.waypoints.length - 1];
+        if (journeyTitle && journeyText) {
+            journeyTitle.textContent = journeySequence.mission.name + ' — ' + last.label;
+            journeyText.textContent = (last.dateLabel || '') + '. ' + (last.note || '');
+        }
+        if (journeyLegIndicator) journeyLegIndicator.textContent = 'Journey complete';
+        if (journeyTime) journeyTime.textContent = '100%';
+    }
+}
+
+if (journeyCloseBtn) {
+    journeyCloseBtn.addEventListener('click', clearJourneySequence);
+}
+if (bodyModal) {
+    bodyModal.addEventListener('click', (event) => {
+        const btn = event.target.closest('.trace-journey-btn');
+        if (!btn) return;
+        const missionId = btn.getAttribute('data-mission-id');
+        const mission = MISSIONS.find(m => m.id === missionId);
+        if (mission) playMissionJourney(mission);
+    });
+}
+
+
 // Set planet and moon orbits to approximate "today" positions (asteroid/Kuiper keep random spread)
 (function setInitialOrbitsToToday() {
     var daysSinceEpoch = (Date.now() - REALTIME_EPOCH_MS) / (24 * 60 * 60 * 1000);
@@ -2265,7 +2618,7 @@ const _modalWorldPos = new THREE.Vector3();
 function animate() {
     requestAnimationFrame(animate);
     var modalOpen = bodyModal && !bodyModal.classList.contains('hidden');
-    var effectivelyPaused = animationPaused || (pauseWhenModalOpen && modalOpen) || !!launchSequence;
+    var effectivelyPaused = animationPaused || (pauseWhenModalOpen && modalOpen) || !!launchSequence || !!journeySequence;
 
     if (!effectivelyPaused) {
         sun.rotation.y += 0.001 * speedMultiplier; 
@@ -2312,6 +2665,10 @@ function animate() {
     // Mission launch-sequence replay (runs independent of orbit pause, like camera transitions)
     if (launchSequence) {
         updateLaunchSequence(performance.now());
+    }
+    // Mission journey replay (same independent-of-pause treatment)
+    if (journeySequence) {
+        updateJourneySequence(performance.now());
     }
 
     // Selection highlight ring and orbit trail
