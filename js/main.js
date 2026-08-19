@@ -1622,6 +1622,31 @@ function populateBodyModal(data) {
     const missionsEl = document.getElementById('modal-missions-list');
     if (!titleEl) return;
 
+    // Standalone deep-space missions (Voyager 1/2, and anything else placed via
+    // radialDistance/polarAngleDeg/azimuthDeg rather than attached to a body) are
+    // not "orbiting" anything in this scene — the marker you clicked IS the mission,
+    // not a body with a sub-list of missions. Route straight to that mission's own
+    // detail instead of searching for bodies whose name matches "Voyager 1" (which
+    // will never exist). Look up the FULL record from MISSIONS by id, not the mesh's
+    // userData — createSpacecraftMesh() only copies a partial field set onto the mesh
+    // and does not include flightPath/journey, so using userData directly would silently
+    // hide the Watch Launch / Trace Journey buttons even after this routing fix.
+    if (data.type === 'Mission' && data.id) {
+        const mission = MISSIONS.find(m => m.id === data.id);
+        if (mission) {
+            titleEl.textContent = mission.name || '—';
+            if (subtitleEl) subtitleEl.textContent = [mission.agency, mission.year].filter(Boolean).join(' · ') || 'Mission';
+            if (factEl) factEl.textContent = mission.type || mission.status || '';
+            if (descEl) descEl.textContent = mission.description || '';
+            if (missionsEl) {
+                missionsEl.innerHTML = '';
+                missionsEl._missionsData = [mission];
+                selectMissionInModalById(mission.id);
+            }
+            return;
+        }
+    }
+
     titleEl.textContent = data.name || '—';
     if (subtitleEl) subtitleEl.textContent = 'From our project';
 
@@ -2022,7 +2047,8 @@ function createSpacecraftMesh(mission) {
     const geometry = new THREE.BoxGeometry(size, size * 0.6, size * 1.2);
     const material = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.userData = {
+
+    const missionUserData = {
         type: 'Mission',
         id: mission.id,
         name: mission.name,
@@ -2037,8 +2063,38 @@ function createSpacecraftMesh(mission) {
         longitudeDeg: mission.longitudeDeg,
         inclinationDeg: mission.inclinationDeg
     };
-    selectableObjects.push(mesh);
-    return mesh;
+    mesh.userData = missionUserData;
+
+    // The box above is scaled to represent an actual spacecraft against planets
+    // sized in the same real-proportioned units, so at deep-space distances
+    // (Voyager, New Horizons, etc. — well over 100 scene-units out) it shrinks to
+    // a fraction of a screen pixel: geometrically correct, but never practically
+    // clickable by anyone. Add a larger, fully invisible sibling purely as a
+    // raycasting target (opacity 0 + depthWrite false, so it never renders or
+    // occludes anything) so every mission stays reliably clickable regardless of
+    // how far out it's placed. Both share identical userData, so whichever one a
+    // raycast actually hits behaves identically to the caller.
+    //
+    // Sized conditionally: missions with radialDistance (standalone deep-space
+    // markers — nothing else is ever nearby) get a generous target. Anything
+    // orbiting close to a parent body (ISS, Hubble, rovers on a surface) keeps a
+    // much smaller target — a flat 2.0-unit sphere would completely engulf small
+    // bodies like Earth (radius 0.5) at typical mission-orbit offsets, silently
+    // intercepting clicks meant for the planet itself.
+    const isStandaloneDeepSpace = mission.radialDistance != null;
+    const hitRadius = isStandaloneDeepSpace ? 2.0 : 0.12;
+    const hitGeometry = new THREE.SphereGeometry(hitRadius, 8, 8);
+    const hitMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
+    const hitTarget = new THREE.Mesh(hitGeometry, hitMaterial);
+    hitTarget.userData = missionUserData;
+
+    const group = new THREE.Group();
+    group.userData = missionUserData;
+    group.add(mesh);
+    group.add(hitTarget);
+
+    selectableObjects.push(hitTarget);
+    return group;
 }
 
 function addSpacecraftToScene() {
@@ -2807,6 +2863,13 @@ function handleBodyDoubleActivate(clientX, clientY) {
             openBodyModal(obj);
         } else if (data && data.type === 'Mission' && data.id) {
             const mission = MISSIONS.find(m => m.id === data.id);
+            // Missions with an interactive replay (Watch Launch / Trace Journey) need
+            // the full body-modal, since that's the only place those buttons render.
+            // Everything else keeps the lighter popup this branch always used.
+            if (mission && (mission.flightPath || mission.journey)) {
+                openBodyModal(obj);
+                return;
+            }
             const content = mission ? buildSpacecraftDetailContent(mission) : buildDetailContent(data);
             if (content) {
                 const worldPos = new THREE.Vector3();
