@@ -1,4 +1,3 @@
-
 🪐 Solar System 3D Explorer
 
 An interactive 3D visualization of the solar system built with Three.js. Explore the Sun, planets, and moons; view space missions and landing sites; and control the camera with presets and toggles.
@@ -14,7 +13,7 @@ An interactive 3D visualization of the solar system built with Three.js. Explore
 * **Toggles:** Show/hide orbits, asteroid belt, Kuiper belt, and labels. **Speed:** 0.5×–4×. **Pause / Resume** orbits.
 * **Missions & links:** Dozens of missions (Apollo, ISS, Hubble, Mars rovers, Voyager, Cassini, etc.) with descriptions and Wikipedia links. Launch sites listed for Earth.
 
- 🖼 Textures
+🖼 Textures
 
 The app expects planet/sun textures in the `textures/` folder. See **[textures/README.md](textures/README.md)** for the list of files (`sun.jpg`, `mercury.jpg`, …, `moon.jpg`, `saturn_ring.jpg`). If a texture is missing, a solid fallback color is used so the app still runs.
 
@@ -25,6 +24,6 @@ The app expects planet/sun textures in the `textures/` folder. See **[textures/R
 
 Loaded from CDN; no build step. Open `index.html` in a browser (use a local server if you add textures so paths resolve correctly).
 
-## 📝 License
+📝 License
 
 MIT License.
